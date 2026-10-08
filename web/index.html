@@ -113,7 +113,9 @@ th{color:var(--dim);font-family:var(--mono);font-size:10.5px;text-transform:uppe
     <h1>⚖️ Before you sweep</h1>
     <p>TelScope is for <b style="color:var(--txt)">authorized investigations only</b>: your own numbers,
     written permission, or legitimate security research. It touches only publicly available data and
-    platform registration flows. Stalking, harassment, doxxing and unauthorized access are prohibited.</p>
+    platform registration flows. Breach-exposure checks are only for identifiers you own or are
+    authorized to check. Stalking, harassment, doxxing and unauthorized access are prohibited.
+    Every sweep is recorded in a local audit log (<code>/api/audit</code>).</p>
     <p>Outputs are probabilistic <b style="color:var(--txt)">leads, not proof</b>. The software is provided
     “AS IS” (MIT) — you are responsible for your use and for complying with your local laws.</p>
     <p>Privacy: everything stays on this machine — no telemetry, no accounts, no cookies.
@@ -139,13 +141,14 @@ th{color:var(--dim);font-family:var(--mono);font-size:10.5px;text-transform:uppe
   <label class="lbl">module timeout (s)</label><input id="s_to" size="6">
   <label class="lbl">phoneinfoga port</label><input id="s_piport" size="6">
   <label class="lbl">numverify API key (optional)</label><input id="s_nvkey" style="width:100%">
+  <label class="lbl">HIBP API key (breach exposure; 32 hex chars)</label><input id="s_hibp" style="width:100%">
   <div class="row" style="margin-top:16px"><button class="btn primary" id="sSave">save</button></div>
   <p class="warnline" style="margin-top:14px">email2phonenumber “bruteforce” mode is never executed by TelScope (scrape only).</p>
 </div>
 
 <script>
 /* ------------------------------ state ------------------------------ */
-const APPLIC={phoneinfoga:["phone"],ignorant:["phone"],moriarty:["phone"],email2phone:["email"],xosint:["phone","email"],phomber:["phone"]};
+const APPLIC={phonemeta:["phone"],phoneinfoga:["phone"],ignorant:["phone"],moriarty:["phone"],email2phone:["email"],xosint:["phone","email"],phomber:["phone"],emailcheck:["email"],emaildns:["email"],domainrdap:["email"],hibp:["email"],hibp_pastes:["email"]};
 let HEALTH={}, SETTINGS={}, CURRENT_JOB=null, ES=null;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -162,7 +165,7 @@ async function boot(){
   HEALTH=await (await fetch("/api/health")).json();
   renderChips();
   const ok=Object.values(HEALTH).filter(h=>h.available).length;
-  $("readyPill").textContent=ok+"/6 modules ready";
+  $("readyPill").textContent=ok+"/"+Object.keys(HEALTH).length+" modules ready";
   $("readyPill").className="pill "+(ok?"ok":"bad");
 }
 $("consentYes").onclick=async()=>{await fetch("/api/consent",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({accepted:true})});boot();};
@@ -235,7 +238,10 @@ function renderJob(job){
   const F=[];for(const [m,res] of Object.entries(job.modules||{}))for(const f of res.findings||[])F.push({...f,module:m,status:res.status});
   const by=t=>F.filter(f=>f.type===t);
   let h=`<div class="find" style="margin-bottom:10px"><span class="k">target</span><span class="v"><b>${esc(job.target.raw)}</b> · ${job.target.type}${job.target.e164?" · "+esc(job.target.e164):""} · ${new Date(job.created_at*1000).toLocaleString()}</span></div>`;
-  const carriers=by("carrier"),lines=by("line_type"),regions=by("region"),plats=by("platform"),spam=by("spam_score"),links=by("link"),val=by("validity"),raw=by("raw"),own=by("owner_hint");
+  const carriers=by("carrier"),lines=by("line_type"),regions=by("region"),plats=by("platform"),spam=by("spam_score"),links=by("link"),val=by("validity"),raw=by("raw"),own=by("owner_hint"),breaches=by("breach");
+  if(breaches.length){h+=`<div class="card" style="margin-bottom:10px"><h2>// breach exposure</h2><div class="find">`;
+    for(const f of breaches)h+=`<div><div class="k">${esc(f.key)} <span class="src">${f.module}</span></div><div class="v">${esc(f.value)}</div></div>`;
+    h+=`</div></div>`;}
   if(carriers.length||lines.length||regions.length){
     h+=`<div class="card" style="margin-bottom:10px"><h2>// carrier & region</h2><div class="find">`;
     for(const f of [...carriers,...lines,...regions])h+=`<div><div class="k">${esc(f.key)} <span class="src">${f.module}</span></div><div class="v">${esc(f.value)}</div></div>`;
@@ -274,9 +280,9 @@ $("histClose").onclick=()=>$("histD").classList.add("hidden");
 $("histClear").onclick=async()=>{if(confirm("Delete ALL investigation history on this machine?")){await fetch("/api/jobs",{method:"DELETE"});loadHistory();}};
 
 /* ------------------------------ settings ------------------------------ */
-$("setBtn").onclick=()=>{const s=SETTINGS;$("s_region").value=s.region;$("s_conc").value=s.concurrency;$("s_to").value=s.module_timeout;$("s_piport").value=s.phoneinfoga_port;$("s_nvkey").value=s.numverify_key||"";$("setD").classList.remove("hidden");};
+$("setBtn").onclick=()=>{const s=SETTINGS;$("s_region").value=s.region;$("s_conc").value=s.concurrency;$("s_to").value=s.module_timeout;$("s_piport").value=s.phoneinfoga_port;$("s_nvkey").value=s.numverify_key||"";$("s_hibp").value=s.hibp_api_key||"";$("setD").classList.remove("hidden");};
 $("setClose").onclick=()=>$("setD").classList.add("hidden");
-$("sSave").onclick=async()=>{await fetch("/api/settings",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({region:$("s_region").value,concurrency:$("s_conc").value,module_timeout:$("s_to").value,phoneinfoga_port:$("s_piport").value,numverify_key:$("s_nvkey").value})});$("setD").classList.add("hidden");boot();};
+$("sSave").onclick=async()=>{await fetch("/api/settings",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({region:$("s_region").value,concurrency:$("s_conc").value,module_timeout:$("s_to").value,phoneinfoga_port:$("s_piport").value,numverify_key:$("s_nvkey").value,hibp_api_key:$("s_hibp").value})});$("setD").classList.add("hidden");boot();};
 
 /* ------------------------------ ambient bg ------------------------------ */
 (function(){var cv=$("bg"),cx=cv.getContext("2d"),W,H,P=[],M={x:-9e3,y:-9e3};

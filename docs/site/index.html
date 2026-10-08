@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TelScope — One sweep. Every signal.</title>
-<meta name="description" content="TelScope: a unified, local-first OSINT dashboard for phone numbers and emails. Six open-source tools, one clean interface. MIT licensed.">
+<meta name="description" content="TelScope: a unified, local-first OSINT dashboard for phone numbers and emails. Twelve modules — six open-source tools plus six built-in checks — one clean interface. MIT licensed.">
 <style>
 /* ============ TelScope · self-contained page · dark signal-ops theme ============ */
 :root{--bg:#070d19;--bg2:#0a1222;--card:rgba(17,28,48,.66);--line:#1e293b;--txt:#e2e8f0;--dim:#94a3b8;
@@ -136,14 +136,14 @@ footer .wrap{display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;
 </div></nav>
 
 <header class="hero"><div class="wrap">
-  <span class="chip"><i></i>v1.0 · MIT · local-first · zero telemetry</span>
+  <span class="chip"><i></i>v2.0 · MIT · local-first · zero telemetry</span>
   <h1 id="title" data-text="TELSCOPE">TELSCOPE</h1>
   <div class="tag" id="tag"></div>
   <p class="sub">A unified, local-first OSINT dashboard for phone numbers &amp; emails.
-  Six battle-tested open-source tools behind one dark, fast interface — carrier intel,
-  platform footprints and spam reputation, merged into one sweep.</p>
+  Twelve modules behind one dark, fast interface — carrier intel, platform footprints,
+  spam reputation, mail-domain posture, breach exposure and domain registration, merged into one sweep.</p>
   <div class="btns">
-    <a class="btn primary" href="https://github.com/soms3r/TelScope/releases/latest/download/TelScope-v1.0.zip">⬇ TelScope-v1.0.zip</a>
+    <a class="btn primary" href="https://github.com/soms3r/TelScope/releases/latest/download/TelScope-v2.0.0.zip">⬇ TelScope-v2.0.0.zip</a>
     <a class="btn ghost" href="https://github.com/soms3r/TelScope">★ github.com/soms3r/TelScope</a>
   </div>
   <div class="term"><div class="bar"><i></i><i></i><i></i><span>telscope — sweep</span></div><pre id="term"></pre></div>
@@ -156,9 +156,9 @@ footer .wrap{display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;
   <h2 class="reveal">Everything one dashboard <em>should do</em></h2>
   <div class="grid">
     <div class="spot tilt reveal"><h3>🌍 Global input</h3><p>Any country's number, auto-normalized to E.164 via Google libphonenumber — or an email address for reverse-direction lookups.</p></div>
-    <div class="spot tilt reveal"><h3>🧩 Six modules</h3><p>Toggleable adapters with per-module health checks; a missing or broken tool degrades to a warning, never a crash.</p></div>
+    <div class="spot tilt reveal"><h3>🧩 Twelve modules</h3><p>Toggleable adapters with per-module health checks; a missing or broken tool degrades to a warning, never a crash.</p></div>
     <div class="spot tilt reveal"><h3>⚡ Live sweep</h3><p>Concurrent execution with streamed logs, per-module timers and one-click cancel that kills every child process.</p></div>
-    <div class="spot tilt reveal"><h3>🧠 Merged intelligence</h3><p>Results merge by finding type — carrier, registrations, reputation, links — with source badges, not six separate dumps.</p></div>
+    <div class="spot tilt reveal"><h3>🧠 Merged intelligence</h3><p>Results merge by finding type — carrier, registrations, reputation, links — with source badges, not twelve separate dumps.</p></div>
     <div class="spot tilt reveal"><h3>🗂 History &amp; exports</h3><p>Local SQLite history with reopen/re-run, and clean exports: JSON, CSV and a printable HTML report (PDF via browser).</p></div>
     <div class="spot tilt reveal"><h3>🔒 Local-first</h3><p>Binds to 127.0.0.1 only. No telemetry, no accounts, no cookies. Your investigations never leave your machine.</p></div>
   </div>
@@ -166,7 +166,7 @@ footer .wrap{display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;
 
 <section id="modules" class="alt"><div class="wrap">
   <span class="k reveal">// 02 · modules &amp; credits</span>
-  <h2 class="reveal">Six tools. <em>Zero credit stolen.</em></h2>
+  <h2 class="reveal">Twelve modules. <em>Zero credit stolen.</em></h2>
   <p class="lead reveal">TelScope orchestrates the open-source community's best phone/email OSINT tools.
   All credit goes to their authors — <a href="credits.html">full credits &amp; licenses</a>.</p>
   <div class="grid">
@@ -176,6 +176,12 @@ footer .wrap{display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;
     <div class="spot tilt reveal"><h3>email2phonenumber</h3><p>Reverse direction: email → phone fragments from recovery flows. Experimental.</p><span class="lic mit">MIT · Martin Vigo</span></div>
     <div class="spot tilt reveal"><h3>X-osint</h3><p>Phone, email, VIN and reverse lookups from the Termux-born framework.</p><span class="lic gpl">GPL-3.0 · TermuxHackz</span></div>
     <div class="spot tilt reveal"><h3>Phomber</h3><p>Carrier plus spam / fraud reputation scoring against reporting databases.</p><span class="lic gpl">GPL-3.0 · s41r4j</span></div>
+    <div class="spot tilt reveal"><h3>Phone metadata</h3><p>Offline validity, line type, region, timezones and prefix-based carrier — no network calls.</p><span class="lic mit">MIT · built-in · libphonenumber</span></div>
+    <div class="spot tilt reveal"><h3>Email checks</h3><p>Domain MX records and disposable-provider flag. No mailbox probing, ever.</p><span class="lic mit">MIT · built-in · dnspython</span></div>
+    <div class="spot tilt reveal"><h3>Mail-domain posture</h3><p>SPF strictness, DMARC policy and common DKIM selectors for an organization's domain.</p><span class="lic mit">MIT · built-in · DNS</span></div>
+    <div class="spot tilt reveal"><h3>Domain registration</h3><p>Registrar, dates, nameservers and status via RDAP. Contact fields are never read.</p><span class="lic mit">MIT · built-in · RDAP</span></div>
+    <div class="spot tilt reveal"><h3>Breach exposure</h3><p>Breaches the address appears in, via Have I Been Pwned API v3. Needs your own key.</p><span class="lic mit">MIT · built-in · HIBP</span></div>
+    <div class="spot tilt reveal"><h3>Paste exposure</h3><p>Pastes that list the address — metadata only (source, date, count), never paste content.</p><span class="lic mit">MIT · built-in · HIBP</span></div>
   </div>
 </div></section>
 
@@ -194,7 +200,7 @@ footer .wrap{display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;
   <span class="k reveal">// 04 · quick start</span>
   <h2 class="reveal">Download. Extract. <em>Double-click.</em></h2>
   <ol class="steps reveal">
-    <li>Download <code>TelScope-v1.0.zip</code> from <a href="https://github.com/soms3r/TelScope/releases">GitHub Releases</a> and verify <code>SHA256SUMS</code>.</li>
+    <li>Download <code>TelScope-v2.0.0.zip</code> from <a href="https://github.com/soms3r/TelScope/releases">GitHub Releases</a> and verify <code>SHA256SUMS</code>.</li>
     <li>Extract anywhere. Requires <strong>Python 3.10+</strong>.</li>
     <li>Run <code>run.bat</code> (Windows) or <code>./run.sh</code> (Linux/macOS) — your browser opens <code>http://127.0.0.1:8000</code>.</li>
   </ol>
@@ -303,7 +309,7 @@ var li=0;(function next(){if(li>=LINES.length){pre.innerHTML+='<span class="care
 })();
 /* ================= ticker ================= */
 (function(){
-var items=['CARRIER LOOKUP','PLATFORM FOOTPRINT','SPAM REPUTATION','E.164 GLOBAL','LIVE SWEEP','LOCAL-FIRST','ZERO TELEMETRY','MIT LICENSE','SIX MODULES','EXPORT JSON·CSV·HTML'];
+var items=['CARRIER LOOKUP','PLATFORM FOOTPRINT','SPAM REPUTATION','E.164 GLOBAL','LIVE SWEEP','LOCAL-FIRST','ZERO TELEMETRY','MIT LICENSE','TWELVE MODULES','AUDIT LOG','BREACH CHECKS','EXPORT JSON·CSV·HTML'];
 var html=items.map(function(s){return '<span><b>✦</b> '+s+'</span>';}).join('');
 document.getElementById('tick').innerHTML=html+html;
 })();

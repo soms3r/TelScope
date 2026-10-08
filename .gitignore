@@ -1,0 +1,12 @@
+venv/
+bin/
+vendor/
+reports/
+*.db
+__pycache__/
+*.pyc
+.bootstrap.json
+dist/
+.DS_Store
+.ph0mber_history
+.pytest_cache/

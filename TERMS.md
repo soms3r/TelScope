@@ -51,8 +51,11 @@ responsible for complying with the laws that apply to you.
 
 ## 7. Third-party components
 
-TelScope wraps six open-source tools that keep their own licenses (see
-[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)). Their use is additionally
+TelScope wraps six open-source tools that keep their own licenses, and adds six
+built-in checks that use DNS, RDAP, libphonenumber and the Have I Been Pwned API
+(see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)). The HIBP API requires your
+own key and is subject to HIBP's terms. Use breach checks only for identifiers you
+own or are authorized to check. Their use is additionally
 governed by those licenses and their own terms.
 
 ## 8. Changes

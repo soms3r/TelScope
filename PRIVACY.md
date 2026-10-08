@@ -14,6 +14,10 @@ TelScope:
   findings, per-module raw output, timestamps, and your settings (default region,
   timeouts, module toggles) plus the first-run consent flag.
 - Exported reports you explicitly create (`reports/`).
+- **Audit log** (`telscope.db`, table `audit`): per sweep, the time, job ID, module
+  list, when consent was granted, and a **keyed HMAC-SHA-256 hash** of the identifier.
+  The raw number or email is not stored there. Clearing history does not clear it;
+  clear it with `DELETE /api/audit` (for example from a terminal or browser dev tools) or delete the folder.
 
 Nothing is uploaded, synced, or shared with the TelScope developer. The developer
 **cannot** see your history — it never leaves your machine.
@@ -24,6 +28,11 @@ Nothing is uploaded, synced, or shared with the TelScope developer. The develope
   available sources and platform endpoints from **your** machine and **your** IP
   address. This is inherent to what the tools do; see each tool's own repository
   for its behaviour.
+- **Built-in checks (v2.0).** `emailcheck`, `emaildns` (DNS lookups for the email's
+  domain), `domainrdap` (RDAP via rdap.org), and `hibp` / `hibp_pastes` (the
+  Have I Been Pwned API, sent with **your** key in the `hibp-api-key` header).
+  `phonemeta` runs fully offline. TelScope sends no mail and never contacts a mail
+  server to probe a mailbox.
 - **One-time setup downloads.** `bootstrap.py` downloads pinned releases of the
   wrapped tools from their official GitHub repositories / PyPI so the app can run.
   No personal data is sent; standard download requests only.
@@ -40,6 +49,7 @@ own privacy policy to page delivery (e.g. IP address in server logs).
 ## 4. Your controls
 
 - **Clear history** button in the UI deletes all jobs/findings from the database.
+- The HIBP API key is stored only in your local database and can be removed in Settings.
 - Deleting the TelScope folder deletes everything else (settings, exports, DB).
 - Module toggles let you limit which tools run for a sweep.
 - The aggressive `bruteforce` mode of email2phonenumber is **off by default** and

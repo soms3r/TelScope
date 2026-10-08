@@ -11,3 +11,11 @@
 
 **Not used:** PyPI `moriarty-project` — different tool (IOC kit), broken vs selectolax ≥1.0.
 Bootstrap re-verifies checksums at download time; pins are bumped only with updated notes.
+
+## Added 2026-10-08 (modules v1.1)
+
+| Component | Pin | Notes |
+|---|---|---|
+| dnspython (pip) | `>=2.6` (ISC) | MX/A lookups for `emailcheck` only; no mailbox probing |
+| phonenumbers (pip) | `>=8.13` (Apache-2.0) | Already a core dep; now also drives `phonemeta` (offline) |
+| HIBP API v3 | `breachedaccount` endpoint | Needs a subscription/test key (`hibp_api_key`, 32 hex). Terms: send a descriptive user-agent; respect 429 `retry-after` |

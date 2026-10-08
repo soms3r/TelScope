@@ -24,6 +24,18 @@ def strip_ansi(text: str) -> str:
     return ANSI_RE.sub("", text).replace("\x1b[H\x1b[J", "")
 
 
+# Set by app.py at startup: returns the current settings dict. Lets adapters
+# whose health() takes no context (e.g. HIBP needs the API key) read settings.
+settings_provider = None
+
+
+def current_settings() -> dict:
+    try:
+        return settings_provider() if settings_provider else {}
+    except Exception:
+        return {}
+
+
 class Ctx:
     """Per-run context handed to adapters."""
 

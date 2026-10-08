@@ -22,7 +22,8 @@ jobs:
           # those are fetched by bootstrap.py on the user's machine at first run.
           zip -r "dist/${NAME}.zip" . \
             -x ".git/*" ".github/*" "docs/site/*" "dist/*" \
-               "vendor/*" "bin/*" "venv/*" "reports/*" "*.db"
+               "vendor/*" "bin/*" "venv/*" "reports/*" "*.db" \
+               "TelScope-repo/*" "*.zip" "__pycache__/*" "*/__pycache__/*"
           (cd dist && sha256sum "${NAME}.zip" > SHA256SUMS)
 
       - name: Publish GitHub Release

@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 Status = Literal["ok", "error", "timeout", "unavailable", "manual"]
 FindingType = Literal[
     "carrier", "line_type", "region", "platform",
-    "spam_score", "link", "owner_hint", "validity", "raw",
+    "spam_score", "link", "owner_hint", "validity", "raw", "breach",
 ]
 Confidence = Literal["high", "medium", "low"]
 

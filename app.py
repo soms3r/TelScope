@@ -1,6 +1,6 @@
 """TelScope — unified local-first OSINT dashboard (MIT).
 
-Binds 127.0.0.1 only. No telemetry. See PRIVACY.md / TERMS.md.
+Binds 127.0.0.1 only. No telemetry. See PRIVACY.md / TERMS.md. v2.0.0: 12 modules.
 """
 from __future__ import annotations
 
@@ -19,6 +19,7 @@ from fastapi.responses import FileResponse, Response, StreamingResponse
 from pydantic import BaseModel
 
 from adapters import ALL_ADAPTERS
+from adapters import base as adapter_base
 from core.bus import Bus
 from core.normalize import parse_target
 from core.orchestrator import Orchestrator
@@ -29,6 +30,7 @@ REPO = Path(__file__).resolve().parent
 store = Store(REPO / "telscope.db")
 bus = Bus()
 orch = Orchestrator(ALL_ADAPTERS, store, bus)
+adapter_base.settings_provider = store.get_settings
 
 
 @asynccontextmanager
@@ -43,7 +45,7 @@ async def lifespan(app: FastAPI):
                 pass
 
 
-app = FastAPI(title="TelScope", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="TelScope", version="2.0.0", lifespan=lifespan)
 
 
 # ---------------------------------------------------------------- UI
@@ -108,6 +110,7 @@ async def sweep(req: SweepReq):
     if not modules:
         raise HTTPException(422, "no applicable modules for this target type")
     store.save_job(job)
+    store.log_audit(job.job_id, target, modules)
     asyncio.create_task(orch.run_sweep(job, modules))
     return {"job_id": job.job_id, "applicable": orch.applicable(target.type)}
 
@@ -133,6 +136,20 @@ async def stream(job_id: str):
         gen(), media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+# ---------------------------------------------------------------- audit
+@app.get("/api/audit")
+async def audit(limit: int = 200):
+    """Read-only log of sweeps: time, job, module list, consent time and a keyed
+    hash of the identifier (never the raw number/email). Survives history clears."""
+    return store.list_audit(limit)
+
+
+@app.delete("/api/audit")
+async def clear_audit():
+    store.clear_audit()
+    return {"ok": True}
 
 
 # ---------------------------------------------------------------- jobs

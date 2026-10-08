@@ -8,3 +8,4 @@ phonenumbers>=8.13
 # Both are optional: without them the matching module shows "unavailable".
 ignorant>=1.2
 phomber>=3.1.1
+dnspython>=2.6

@@ -1,7 +1,10 @@
 """Local SQLite persistence: jobs, settings, consent (MIT). No telemetry."""
 from __future__ import annotations
 
+import hashlib
+import hmac
 import json
+import secrets
 import sqlite3
 import threading
 import time
@@ -13,6 +16,11 @@ from .schema import Job, ModuleResult, Target
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY, value TEXT);
 CREATE TABLE IF NOT EXISTS consent(id INTEGER PRIMARY KEY CHECK (id=1), accepted_at REAL);
+CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY, value TEXT);
+CREATE TABLE IF NOT EXISTS audit(
+  id INTEGER PRIMARY KEY AUTOINCREMENT, ts REAL, job_id TEXT, target_type TEXT,
+  target_hash TEXT, modules TEXT, consent_at REAL
+);
 CREATE TABLE IF NOT EXISTS jobs(
   id TEXT PRIMARY KEY, created_at REAL, target_raw TEXT, target_type TEXT,
   status TEXT, result_json TEXT
@@ -26,6 +34,7 @@ DEFAULT_SETTINGS = {
     "phoneinfoga_port": "5001",
     "numverify_key": "",
     "allow_bruteforce": "false",
+    "hibp_api_key": "",
 }
 
 
@@ -73,6 +82,47 @@ class Store:
                 (ts,),
             )
         return ts
+
+    # audit ------------------------------------------------------------
+    def _audit_salt(self, c) -> bytes:
+        row = c.execute("SELECT value FROM meta WHERE key='audit_salt'").fetchone()
+        if row:
+            return bytes.fromhex(row[0])
+        salt = secrets.token_bytes(32)
+        c.execute("INSERT INTO meta(key,value) VALUES('audit_salt',?)", (salt.hex(),))
+        return salt
+
+    def log_audit(self, job_id: str, target, modules: list[str]) -> None:
+        """Record WHO-independent metadata about a sweep: when, which modules,
+        and a keyed hash of the identifier (never the raw number/email).
+        Audit rows survive 'clear history' on purpose."""
+        ident = (target.e164 or target.email or target.raw or "").encode()
+        with self._lock, self._conn() as c:
+            salt = self._audit_salt(c)
+            digest = hmac.new(salt, ident, hashlib.sha256).hexdigest()
+            consent = c.execute("SELECT accepted_at FROM consent WHERE id=1").fetchone()
+            c.execute(
+                "INSERT INTO audit(ts,job_id,target_type,target_hash,modules,consent_at) "
+                "VALUES(?,?,?,?,?,?)",
+                (time.time(), job_id, target.type, digest,
+                 json.dumps(modules), consent[0] if consent else None),
+            )
+
+    def list_audit(self, limit: int = 200) -> list[dict]:
+        with self._lock, self._conn() as c:
+            rows = c.execute(
+                "SELECT ts,job_id,target_type,target_hash,modules,consent_at "
+                "FROM audit ORDER BY id DESC LIMIT ?", (limit,),
+            ).fetchall()
+        return [
+            {"ts": r[0], "job_id": r[1], "target_type": r[2], "target_hash": r[3],
+             "modules": json.loads(r[4]), "consent_at": r[5]}
+            for r in rows
+        ]
+
+    def clear_audit(self) -> None:
+        with self._lock, self._conn() as c:
+            c.execute("DELETE FROM audit")
 
     # jobs -------------------------------------------------------------
     def save_job(self, job: Job) -> None:

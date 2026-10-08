@@ -17,7 +17,16 @@ code** into its codebase.
 | X-osint | TermuxHackz | GPL-3.0 | <https://github.com/TermuxHackz/X-osint> | Phone / email / VIN / reverse lookups (via CLI subprocess) |
 | Phomber | s41r4j | GPL-3.0 | <https://github.com/s41r4j/phomber> | Carrier + spam / fraud reputation (via CLI subprocess) |
 
-Python runtime dependencies (FastAPI, uvicorn, httpx, phonenumbers, pydantic, …)
+### Built-in checks (v2.0, TelScope's own MIT code)
+
+| Dependency / service | Author | License / terms | Used by |
+|---|---|---|---|
+| phonenumbers (libphonenumber port) | David Drysdale (based on Google libphonenumber) | Apache-2.0 | `phonemeta`, number normalization |
+| dnspython | Bob Halley & contributors | ISC | `emailcheck`, `emaildns` |
+| Have I Been Pwned API v3 | Troy Hunt | HIBP API terms (own key required) | `hibp`, `hibp_pastes` |
+| RDAP redirector | rdap.org | public service | `domainrdap` |
+
+Python runtime dependencies (FastAPI, uvicorn, httpx, phonenumbers, pydantic, dnspython, …)
 are used under their respective permissive licenses and listed in
 `requirements.txt` with pins.
 

@@ -1,0 +1,15 @@
+{
+  "objectClassName": "domain",
+  "ldhName": "EXAMPLE.ORG",
+  "status": ["client transfer prohibited", "active"],
+  "events": [
+    {"eventAction": "registration", "eventDate": "1995-08-14T04:00:00Z"},
+    {"eventAction": "expiration", "eventDate": "2027-08-13T04:00:00Z"},
+    {"eventAction": "last changed", "eventDate": "2025-08-14T07:01:00Z"}
+  ],
+  "nameservers": [{"ldhName": "A.IANA-SERVERS.NET"}, {"ldhName": "B.IANA-SERVERS.NET"}],
+  "entities": [
+    {"roles": ["registrar"], "vcardArray": ["vcard", [["version", {}, "text", "4.0"], ["fn", {}, "text", "Example Registrar, Inc."]]]},
+    {"roles": ["registrant"], "vcardArray": ["vcard", [["version", {}, "text", "4.0"], ["fn", {}, "text", "PRIVATE PERSON"], ["email", {}, "text", "private@example.net"]]]}
+  ]
+}

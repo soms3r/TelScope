@@ -1,0 +1,6 @@
+[
+  {"Name": "Adobe", "Title": "Adobe", "Domain": "adobe.com", "BreachDate": "2013-10-04",
+   "DataClasses": ["Email addresses", "Password hints", "Passwords", "Usernames"], "PwnCount": 152445165},
+  {"Name": "Canva", "Title": "Canva", "Domain": "canva.com", "BreachDate": "2019-05-24",
+   "DataClasses": ["Email addresses", "Geographic locations", "Names"], "PwnCount": 137272116}
+]
