@@ -1,0 +1,1 @@
+# TelScope core package (MIT)
