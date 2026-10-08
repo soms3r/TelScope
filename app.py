@@ -235,4 +235,5 @@ if __name__ == "__main__":
     # Default: localhost-only (privacy design). TELSCOPE_HOST override exists for
     # reverse-proxied demos (e.g. cloud sandboxes); never ship a public bind.
     host = os.environ.get("TELSCOPE_HOST", "127.0.0.1")
-    uvicorn.run(app, host=host, port=8000, log_level="warning")
+    port = int(os.environ.get("TELSCOPE_PORT", "8000"))
+    uvicorn.run(app, host=host, port=port, log_level="warning")
